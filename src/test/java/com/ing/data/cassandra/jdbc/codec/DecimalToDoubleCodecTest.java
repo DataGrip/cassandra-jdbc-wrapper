@@ -15,10 +15,13 @@ package com.ing.data.cassandra.jdbc.codec;
 
 import com.datastax.oss.driver.api.core.ProtocolVersion;
 import com.datastax.oss.driver.api.core.type.DataTypes;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 import static com.ing.data.cassandra.jdbc.utils.DriverUtil.NULL_KEYWORD;
@@ -47,9 +50,11 @@ public class DecimalToDoubleCodecTest {
 
     @Test
     void givenValue_whenEncode_returnByteBuffer() {
-        ByteBuffer bytes = sut.encode(12.345, ProtocolVersion.DEFAULT);
+        BigDecimal bigDecimal = BigDecimal.valueOf(12.345);
+        ByteBuffer bytes = sut.encode(bigDecimal.doubleValue(), ProtocolVersion.DEFAULT);
         assertNotNull(bytes);
-        assertEquals(12.345, Double.valueOf(bytes.getDouble()));
+        TypeCodec<BigDecimal> decimalCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.DECIMAL, BigDecimal.class);
+        assertEquals(bigDecimal, decimalCodec.decode(bytes, ProtocolVersion.DEFAULT));
     }
 
     @Test
@@ -59,7 +64,9 @@ public class DecimalToDoubleCodecTest {
 
     @Test
     void givenValue_whenDecode_returnDouble() {
-        ByteBuffer bytes = ByteBuffer.allocate(8).putDouble(12.345);
+        TypeCodec<BigDecimal> decimalCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.DECIMAL, BigDecimal.class);
+        ByteBuffer bytes = decimalCodec.encode(BigDecimal.valueOf(12.345), ProtocolVersion.DEFAULT);
+        assertNotNull(bytes);
         bytes.position(0);
         assertEquals(Double.valueOf(12.345), sut.decode(bytes, ProtocolVersion.DEFAULT));
     }
