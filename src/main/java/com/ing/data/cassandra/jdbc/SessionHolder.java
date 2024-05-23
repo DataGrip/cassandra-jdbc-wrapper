@@ -26,20 +26,10 @@ import com.datastax.oss.driver.api.core.context.DriverContext;
 import com.datastax.oss.driver.api.core.session.ProgrammaticArguments;
 import com.datastax.oss.driver.api.core.session.Session;
 import com.datastax.oss.driver.api.core.ssl.SslEngineFactory;
-import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.internal.core.context.DefaultDriverContext;
 import com.datastax.oss.driver.internal.core.loadbalancing.DefaultLoadBalancingPolicy;
 import com.datastax.oss.driver.internal.core.ssl.DefaultSslEngineFactory;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.ing.data.cassandra.jdbc.codec.BigintToBigDecimalCodec;
-import com.ing.data.cassandra.jdbc.codec.DecimalToDoubleCodec;
-import com.ing.data.cassandra.jdbc.codec.FloatToDoubleCodec;
-import com.ing.data.cassandra.jdbc.codec.IntToLongCodec;
-import com.ing.data.cassandra.jdbc.codec.LongToIntCodec;
-import com.ing.data.cassandra.jdbc.codec.SmallintToIntCodec;
-import com.ing.data.cassandra.jdbc.codec.TimestampToLongCodec;
-import com.ing.data.cassandra.jdbc.codec.TinyintToIntCodec;
-import com.ing.data.cassandra.jdbc.codec.VarintToIntCodec;
 import com.ing.data.cassandra.jdbc.utils.ContactPoint;
 import com.instaclustr.cassandra.driver.auth.KerberosAuthProviderBase;
 import com.instaclustr.cassandra.driver.auth.ProgrammaticKerberosAuthProvider;
@@ -53,7 +43,6 @@ import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +56,6 @@ import static com.ing.data.cassandra.jdbc.utils.DriverUtil.JSSE_KEYSTORE_PROPERT
 import static com.ing.data.cassandra.jdbc.utils.DriverUtil.JSSE_TRUSTSTORE_PASSWORD_PROPERTY;
 import static com.ing.data.cassandra.jdbc.utils.DriverUtil.JSSE_TRUSTSTORE_PROPERTY;
 import static com.ing.data.cassandra.jdbc.utils.ErrorConstants.SSL_CONFIG_FAILED;
-import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USE_KERBEROS;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_CLOUD_SECURE_CONNECT_BUNDLE;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_CONFIG_FILE;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_CONNECT_TIMEOUT;
@@ -88,6 +76,7 @@ import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_SSL_ENGINE_FACTO
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_SSL_HOSTNAME_VERIFICATION;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_TCP_NO_DELAY;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USER;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USE_KERBEROS;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.parseReconnectionPolicy;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.parseURL;
 
@@ -340,19 +329,6 @@ class SessionHolder {
                 KerberosAuthProviderBase.KerberosAuthOptions.builder().build()
             ));
         }
-
-        // Declare and register codecs.
-        final List<TypeCodec<?>> codecs = new ArrayList<>();
-        codecs.add(new TimestampToLongCodec());
-        codecs.add(new LongToIntCodec());
-        codecs.add(new IntToLongCodec());
-        codecs.add(new BigintToBigDecimalCodec());
-        codecs.add(new DecimalToDoubleCodec());
-        codecs.add(new FloatToDoubleCodec());
-        codecs.add(new VarintToIntCodec());
-        codecs.add(new SmallintToIntCodec());
-        codecs.add(new TinyintToIntCodec());
-        builder.addTypeCodecs(codecs.toArray(new TypeCodec[]{}));
 
         builder.withKeyspace(keyspace);
         builder.withConfigLoader(driverConfigLoaderBuilder.build());

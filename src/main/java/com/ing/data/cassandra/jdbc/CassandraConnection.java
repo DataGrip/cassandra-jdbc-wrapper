@@ -25,14 +25,25 @@ import com.datastax.oss.driver.api.core.session.Session;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.internal.core.type.codec.registry.DefaultCodecRegistry;
 import com.ing.data.cassandra.jdbc.codec.BigintToBigDecimalCodec;
+import com.ing.data.cassandra.jdbc.codec.BlobToByteArrayCodec;
+import com.ing.data.cassandra.jdbc.codec.DateToDateCodec;
 import com.ing.data.cassandra.jdbc.codec.DecimalToDoubleCodec;
+import com.ing.data.cassandra.jdbc.codec.DecimalToLongCodec;
+import com.ing.data.cassandra.jdbc.codec.DoubleToLongCodec;
 import com.ing.data.cassandra.jdbc.codec.FloatToDoubleCodec;
+import com.ing.data.cassandra.jdbc.codec.FloatToLongCodec;
+import com.ing.data.cassandra.jdbc.codec.InetToStringCodec;
 import com.ing.data.cassandra.jdbc.codec.IntToLongCodec;
 import com.ing.data.cassandra.jdbc.codec.LongToIntCodec;
 import com.ing.data.cassandra.jdbc.codec.SmallintToIntCodec;
+import com.ing.data.cassandra.jdbc.codec.SmallintToLongCodec;
 import com.ing.data.cassandra.jdbc.codec.TimestampToLongCodec;
+import com.ing.data.cassandra.jdbc.codec.TimeuuidToStringCodec;
 import com.ing.data.cassandra.jdbc.codec.TinyintToIntCodec;
+import com.ing.data.cassandra.jdbc.codec.TinyintToLongCodec;
+import com.ing.data.cassandra.jdbc.codec.UuidToStringCodec;
 import com.ing.data.cassandra.jdbc.codec.VarintToIntCodec;
+import com.ing.data.cassandra.jdbc.codec.VarintToLongCodec;
 import com.ing.data.cassandra.jdbc.optionset.Default;
 import com.ing.data.cassandra.jdbc.optionset.OptionSet;
 import org.apache.commons.lang3.StringUtils;
@@ -193,6 +204,8 @@ public class CassandraConnection extends AbstractConnection implements Connectio
                 LOG.info("Node: {} runs Cassandra v.{}", entry.getValue().getEndPoint().resolve(), cassandraVersion);
             }
         });
+
+        registerCodecs(cSession);
     }
 
     /**
@@ -221,6 +234,10 @@ public class CassandraConnection extends AbstractConnection implements Connectio
         this.metadata = cSession.getMetadata();
         this.consistencyLevel = defaultConsistencyLevel;
         this.debugMode = debugMode;
+        registerCodecs(cSession);
+    }
+
+    private static void registerCodecs(Session cSession) {
         final List<TypeCodec<?>> codecs = new ArrayList<>();
         codecs.add(new TimestampToLongCodec());
         codecs.add(new LongToIntCodec());
@@ -231,6 +248,19 @@ public class CassandraConnection extends AbstractConnection implements Connectio
         codecs.add(new VarintToIntCodec());
         codecs.add(new SmallintToIntCodec());
         codecs.add(new TinyintToIntCodec());
+        codecs.add(new BlobToByteArrayCodec());
+        codecs.add(new DateToDateCodec());
+        codecs.add(new DecimalToLongCodec());
+        codecs.add(new DoubleToLongCodec());
+//        codecs.add(new DurationToStringCodec());
+        codecs.add(new InetToStringCodec());
+//        codecs.add(new TimeToTimeCodec());
+        codecs.add(new TimeuuidToStringCodec());
+        codecs.add(new UuidToStringCodec());
+        codecs.add(new VarintToLongCodec());
+        codecs.add(new FloatToLongCodec());
+        codecs.add(new SmallintToLongCodec());
+        codecs.add(new TinyintToLongCodec());
 
         codecs.forEach(codec -> ((DefaultCodecRegistry) cSession.getContext().getCodecRegistry()).register(codec));
     }
