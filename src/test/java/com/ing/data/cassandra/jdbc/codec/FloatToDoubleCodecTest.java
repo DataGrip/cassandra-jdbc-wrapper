@@ -15,6 +15,8 @@ package com.ing.data.cassandra.jdbc.codec;
 
 import com.datastax.oss.driver.api.core.ProtocolVersion;
 import com.datastax.oss.driver.api.core.type.DataTypes;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -60,8 +62,10 @@ public class FloatToDoubleCodecTest {
 
     @Test
     void givenValue_whenDecode_returnDouble() {
+        TypeCodec<Float> codec = CodecRegistry.DEFAULT.codecFor(DataTypes.FLOAT, Float.class);
         final float floatValue = 12.345f;
-        ByteBuffer bytes = ByteBuffer.allocate(8).putFloat(floatValue);
+        ByteBuffer bytes = codec.encode(floatValue, ProtocolVersion.DEFAULT);
+        assertNotNull(bytes);
         bytes.position(0);
         assertEquals(Double.valueOf(floatValue), sut.decode(bytes, ProtocolVersion.DEFAULT));
     }
