@@ -30,6 +30,7 @@ import com.ing.data.cassandra.jdbc.codec.DateToDateCodec;
 import com.ing.data.cassandra.jdbc.codec.DecimalToDoubleCodec;
 import com.ing.data.cassandra.jdbc.codec.DecimalToLongCodec;
 import com.ing.data.cassandra.jdbc.codec.DoubleToLongCodec;
+import com.ing.data.cassandra.jdbc.codec.DurationToStringCodec;
 import com.ing.data.cassandra.jdbc.codec.FloatToDoubleCodec;
 import com.ing.data.cassandra.jdbc.codec.FloatToLongCodec;
 import com.ing.data.cassandra.jdbc.codec.InetToStringCodec;
@@ -252,7 +253,7 @@ public class CassandraConnection extends AbstractConnection implements Connectio
         codecs.add(new DateToDateCodec());
         codecs.add(new DecimalToLongCodec());
         codecs.add(new DoubleToLongCodec());
-//        codecs.add(new DurationToStringCodec());
+        codecs.add(new DurationToStringCodec());
         codecs.add(new InetToStringCodec());
 //        codecs.add(new TimeToTimeCodec());
         codecs.add(new TimeuuidToStringCodec());

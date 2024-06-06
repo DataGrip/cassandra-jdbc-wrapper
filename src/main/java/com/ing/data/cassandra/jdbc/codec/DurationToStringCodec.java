@@ -1,6 +1,7 @@
 package com.ing.data.cassandra.jdbc.codec;
 
 import com.datastax.oss.driver.api.core.ProtocolVersion;
+import com.datastax.oss.driver.api.core.data.CqlDuration;
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
@@ -10,13 +11,12 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 import java.nio.ByteBuffer;
-import java.time.Duration;
 
 /**
  * @author Liudmila Kornilova
  **/
 public class DurationToStringCodec implements TypeCodec<String> {
-    private final TypeCodec<Duration> durationCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.DURATION, Duration.class);
+    private final TypeCodec<CqlDuration> durationCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.DURATION, CqlDuration.class);
 
     @NonNull
     @Override
@@ -33,14 +33,14 @@ public class DurationToStringCodec implements TypeCodec<String> {
     @Override
     public ByteBuffer encode(String value, @NonNull ProtocolVersion protocolVersion) {
         if (value == null) return null;
-        Duration duration = Duration.parse(value);
+        CqlDuration duration = CqlDuration.from(value);
         return durationCodec.encode(duration, protocolVersion);
     }
 
     @Override
     public String decode(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
         if (bytes == null) return null;
-        Duration duration = durationCodec.decode(bytes, protocolVersion);
+        CqlDuration duration = durationCodec.decode(bytes, protocolVersion);
         return duration == null ? null : duration.toString();
     }
 
