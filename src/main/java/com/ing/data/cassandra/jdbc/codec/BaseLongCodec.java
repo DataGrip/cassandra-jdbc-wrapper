@@ -3,9 +3,9 @@ package com.ing.data.cassandra.jdbc.codec;
 import com.datastax.oss.driver.api.core.ProtocolVersion;
 import com.datastax.oss.driver.api.core.type.codec.PrimitiveLongCodec;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 /**
@@ -18,7 +18,7 @@ public abstract class BaseLongCodec implements PrimitiveLongCodec {
 
     abstract long deserializeNoBoxingInner(ByteBuffer bytes);
 
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<Long> getJavaType() {
         return GenericType.LONG;
@@ -30,14 +30,14 @@ public abstract class BaseLongCodec implements PrimitiveLongCodec {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public String format(@Nullable Long value) {
         if (value == null) return "NULL";
         return Long.toString(value);
     }
 
     @Override
-    public ByteBuffer encodePrimitive(long value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encodePrimitive(long value, @Nonnull ProtocolVersion protocolVersion) {
         ByteBuffer bb = ByteBuffer.allocate(getNumberOfBytes());
         serializeNoBoxingInner(value, bb);
         bb.flip();
@@ -45,7 +45,7 @@ public abstract class BaseLongCodec implements PrimitiveLongCodec {
     }
 
     @Override
-    public long decodePrimitive(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public long decodePrimitive(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         if (bytes == null || bytes.remaining() == 0) return 0;
         if (bytes.remaining() != getNumberOfBytes()) {
             throw new IllegalStateException("Invalid value, expecting " + getNumberOfBytes() + " bytes but got " + bytes.remaining());

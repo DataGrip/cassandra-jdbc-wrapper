@@ -6,8 +6,8 @@ import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -17,26 +17,26 @@ import java.util.UUID;
 public class TimeuuidToStringCodec implements TypeCodec<String> {
     private final TypeCodec<UUID> timeuuidCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.TIMEUUID, UUID.class);
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.TIMEUUID;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<String> getJavaType() {
         return GenericType.STRING;
     }
 
     @Override
-    public ByteBuffer encode(String value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encode(String value, @Nonnull ProtocolVersion protocolVersion) {
         if (value == null) return null;
         return timeuuidCodec.encode(UUID.fromString(value), protocolVersion);
     }
 
     @Override
-    public String decode(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public String decode(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         if (bytes == null) return null;
         UUID uuid = timeuuidCodec.decode(bytes, protocolVersion);
         return uuid == null ? null : uuid.toString();
@@ -48,7 +48,7 @@ public class TimeuuidToStringCodec implements TypeCodec<String> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public String format(String value) {
         throw new RuntimeException("Not implemented");
     }

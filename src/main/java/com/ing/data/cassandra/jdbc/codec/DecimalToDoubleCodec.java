@@ -7,7 +7,6 @@ import com.datastax.oss.driver.api.core.type.codec.PrimitiveDoubleCodec;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -17,25 +16,25 @@ import java.nio.ByteBuffer;
 public class DecimalToDoubleCodec extends AbstractCodec<Double> implements PrimitiveDoubleCodec {
     private final TypeCodec<BigDecimal> decimalCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.DECIMAL, BigDecimal.class);
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.DECIMAL;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<Double> getJavaType() {
         return GenericType.DOUBLE;
     }
 
     @Override
-    public ByteBuffer encodePrimitive(double value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encodePrimitive(double value, @Nonnull ProtocolVersion protocolVersion) {
         return decimalCodec.encode(BigDecimal.valueOf(value), protocolVersion);
     }
 
     @Override
-    public double decodePrimitive(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public double decodePrimitive(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         BigDecimal bigDecimal = decimalCodec.decode(bytes, protocolVersion);
         if (bigDecimal == null) return 0;
         return bigDecimal.doubleValue();

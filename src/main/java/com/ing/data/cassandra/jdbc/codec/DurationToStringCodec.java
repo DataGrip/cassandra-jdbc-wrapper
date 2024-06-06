@@ -7,9 +7,9 @@ import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 /**
@@ -18,27 +18,27 @@ import java.nio.ByteBuffer;
 public class DurationToStringCodec implements TypeCodec<String> {
     private final TypeCodec<CqlDuration> durationCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.DURATION, CqlDuration.class);
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.DURATION;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<String> getJavaType() {
         return GenericType.STRING;
     }
 
     @Override
-    public ByteBuffer encode(String value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encode(String value, @Nonnull ProtocolVersion protocolVersion) {
         if (value == null) return null;
         CqlDuration duration = CqlDuration.from(value);
         return durationCodec.encode(duration, protocolVersion);
     }
 
     @Override
-    public String decode(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public String decode(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         if (bytes == null) return null;
         CqlDuration duration = durationCodec.decode(bytes, protocolVersion);
         return duration == null ? null : duration.toString();
@@ -51,7 +51,7 @@ public class DurationToStringCodec implements TypeCodec<String> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public String format(@Nullable String value) {
         throw new RuntimeException("Not supported");
     }

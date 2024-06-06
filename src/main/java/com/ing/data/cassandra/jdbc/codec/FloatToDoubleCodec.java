@@ -20,27 +20,26 @@ import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.core.type.codec.PrimitiveDoubleCodec;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 public class FloatToDoubleCodec extends AbstractCodec<Double> implements PrimitiveDoubleCodec {
 
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<Double> getJavaType() {
         return GenericType.DOUBLE;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.FLOAT;
     }
 
     @Override
-    public ByteBuffer encodePrimitive(double value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encodePrimitive(double value, @Nonnull ProtocolVersion protocolVersion) {
         ByteBuffer bb = ByteBuffer.allocate(4);
         bb.putFloat((float) value);
         bb.flip();
@@ -48,7 +47,7 @@ public class FloatToDoubleCodec extends AbstractCodec<Double> implements Primiti
     }
 
     @Override
-    public double decodePrimitive(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public double decodePrimitive(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         if (bytes == null || bytes.remaining() != 4)
             throw new IllegalArgumentException(
                     "Invalid 32-bits float value, expecting 4 bytes but got " + (bytes == null ? null : bytes.remaining()));

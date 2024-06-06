@@ -6,8 +6,8 @@ import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
+import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -18,20 +18,20 @@ import java.nio.ByteBuffer;
 public class InetToStringCodec implements TypeCodec<String> {
     private final TypeCodec<InetAddress> inetCodec = CodecRegistry.DEFAULT.codecFor(DataTypes.INET, InetAddress.class);
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.INET;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<String> getJavaType() {
         return GenericType.STRING;
     }
 
     @Override
-    public ByteBuffer encode(String value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encode(String value, @Nonnull ProtocolVersion protocolVersion) {
         if (value == null) return null;
         try {
             return inetCodec.encode(InetAddress.getByName(value), protocolVersion);
@@ -41,7 +41,7 @@ public class InetToStringCodec implements TypeCodec<String> {
     }
 
     @Override
-    public String decode(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public String decode(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         if (bytes == null) return null;
         InetAddress address = inetCodec.decode(bytes, protocolVersion);
         return address == null ? null : address.getHostAddress();
@@ -53,7 +53,7 @@ public class InetToStringCodec implements TypeCodec<String> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public String format(String value) {
         throw new RuntimeException("Not implemented");
     }

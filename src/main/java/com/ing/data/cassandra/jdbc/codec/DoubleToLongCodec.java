@@ -2,8 +2,8 @@ package com.ing.data.cassandra.jdbc.codec;
 
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
+import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 /**
@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
  **/
 public class DoubleToLongCodec extends BaseLongCodec {
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.DOUBLE;

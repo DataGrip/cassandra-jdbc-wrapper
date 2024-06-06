@@ -6,8 +6,8 @@ import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -16,13 +16,13 @@ import java.nio.ByteBuffer;
  * @author Liudmila Kornilova
  **/
 public class DecimalToLongCodec implements TypeCodec<Long> {
-    @NonNull
+    @Nonnull
     @Override
     public GenericType<Long> getJavaType() {
         return GenericType.LONG;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public DataType getCqlType() {
         return DataTypes.DECIMAL;
@@ -36,14 +36,14 @@ public class DecimalToLongCodec implements TypeCodec<Long> {
     }
 
     @Override
-    @NonNull
+    @Nonnull
     public String format(Long value) {
         if (value == null) return "NULL";
         return value.toString();
     }
 
     @Override
-    public ByteBuffer encode(Long value, @NonNull ProtocolVersion protocolVersion) {
+    public ByteBuffer encode(Long value, @Nonnull ProtocolVersion protocolVersion) {
         if (value == null) return null;
         BigDecimal bigDecimal = new BigDecimal(value);
         BigInteger bi = bigDecimal.unscaledValue();
@@ -58,7 +58,7 @@ public class DecimalToLongCodec implements TypeCodec<Long> {
     }
 
     @Override
-    public Long decode(ByteBuffer bytes, @NonNull ProtocolVersion protocolVersion) {
+    public Long decode(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
         if (bytes == null || bytes.remaining() == 0) return null;
         if (bytes.remaining() < 4) {
             throw new IllegalStateException("Invalid decimal value, expecting at least 4 bytes but got " + bytes.remaining());
