@@ -7,9 +7,10 @@ merge branches which were not merged to upstream (hopefully without merge confli
 Release flow is the following:
 1. Make sure that main branch `release/next` is in sync with upstream `release/next`.
 1. Checkout `release/next`, copy the current version from pom.xml and create new branch `DataGrip/release/<version>-DataGrip-patch-<N>`
-1. Merge branches that were not merged to upstream:
+1. Merge branches that were not merged to upstream (check for other branches `DataGrip/...`)
    ```
    DataGrip/add-missing-codecs
+   DataGrip/support-ssl-mode-REQUIRE
    ```
 1. Go to pom.xml and add `-DataGrip-patch-N` postfix to version e.g. `<version>-DataGrip-patch-<N>`
 1. Push new branch
