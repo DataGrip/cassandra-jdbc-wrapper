@@ -39,6 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyStore;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.time.Duration;
@@ -77,8 +80,13 @@ import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_SSL_HOSTNAME_VER
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_TCP_NO_DELAY;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USER;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USE_KERBEROS;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USE_KERBEROS;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_VERIFY_SERVER_CERTIFICATE;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.VERIFY_SERVER_CERTIFICATE_DEFAULT;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.parseReconnectionPolicy;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.parseURL;
+import static com.ing.data.cassandra.jdbc.utils.SSLUtil.getTrustEverybodySSLContext;
+import static com.ing.data.cassandra.jdbc.utils.SSLUtil.isNullOrEmpty;
 
 /**
  * Holds a {@link Session} shared among multiple {@link CassandraConnection} objects.
@@ -336,12 +344,28 @@ class SessionHolder {
         // SSL configuration.
         if (StringUtils.isBlank(cloudSecureConnectBundle)) {
             if (sslEnabled) {
-                if (StringUtils.isNotEmpty(sslEngineFactoryClassName)) {
-                    configureSslEngineFactory(builder, sslEngineFactoryClassName);
+                final String verifyServerCertificateValue = properties.getProperty(TAG_VERIFY_SERVER_CERTIFICATE, VERIFY_SERVER_CERTIFICATE_DEFAULT);
+                if (Boolean.TRUE.toString().equals(verifyServerCertificateValue)) {
+                    if (StringUtils.isNotEmpty(sslEngineFactoryClassName)) {
+                        configureSslEngineFactory(builder, sslEngineFactoryClassName);
+                    } else {
+                        driverConfigLoaderBuilder.withBoolean(DefaultDriverOption.SSL_HOSTNAME_VALIDATION,
+                            sslHostnameVerificationEnabled);
+                        configureDefaultSslEngineFactory(builder, driverConfigLoaderBuilder);
+                    }
                 } else {
-                    driverConfigLoaderBuilder.withBoolean(DefaultDriverOption.SSL_HOSTNAME_VALIDATION,
-                        sslHostnameVerificationEnabled);
-                    configureDefaultSslEngineFactory(builder, driverConfigLoaderBuilder);
+                    String keyStoreType = System.getProperty("javax.net.ssl.keyStoreType", KeyStore.getDefaultType());
+                    String keyStorePassword = System.getProperty(JSSE_KEYSTORE_PASSWORD_PROPERTY, "");
+                    String keyStoreUrl = System.getProperty(JSSE_KEYSTORE_PROPERTY, "");
+                    // check keyStoreUrl
+                    if (!isNullOrEmpty(keyStoreUrl)) {
+                        try {
+                            new URL(keyStoreUrl);
+                        } catch (MalformedURLException e) {
+                            keyStoreUrl = "file:" + keyStoreUrl;
+                        }
+                    }
+                    builder.withSslContext(getTrustEverybodySSLContext(keyStoreUrl, keyStoreType, keyStorePassword));
                 }
             }
         } else {
