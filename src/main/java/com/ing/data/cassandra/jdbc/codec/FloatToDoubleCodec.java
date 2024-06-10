@@ -18,23 +18,13 @@ package com.ing.data.cassandra.jdbc.codec;
 import com.datastax.oss.driver.api.core.ProtocolVersion;
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
-import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.PrimitiveDoubleCodec;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import com.ing.data.cassandra.jdbc.utils.ByteBufferUtil;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
-/**
- * Manages the two-way conversion between the CQL type {@link DataTypes#FLOAT} and the Java type {@link Double}.
- */
-public class FloatToDoubleCodec extends AbstractCodec<Double> implements TypeCodec<Double> {
-
-    /**
-     * Constructor for {@code FloatToDoubleCodec}.
-     */
-    public FloatToDoubleCodec() {
-    }
+public class FloatToDoubleCodec extends AbstractCodec<Double> implements PrimitiveDoubleCodec {
 
     @Nonnull
     @Override
@@ -49,21 +39,20 @@ public class FloatToDoubleCodec extends AbstractCodec<Double> implements TypeCod
     }
 
     @Override
-    public ByteBuffer encode(final Double value, @Nonnull final ProtocolVersion protocolVersion) {
-        if (value == null) {
-            return null;
-        }
-        return ByteBufferUtil.bytes(value.floatValue());
+    public ByteBuffer encodePrimitive(double value, @Nonnull ProtocolVersion protocolVersion) {
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        bb.putFloat((float) value);
+        bb.flip();
+        return bb;
     }
 
     @Override
-    public Double decode(final ByteBuffer bytes, @Nonnull final ProtocolVersion protocolVersion) {
-        if (bytes == null) {
-            return null;
-        }
-        // always duplicate the ByteBuffer instance before consuming it!
-        final float value = ByteBufferUtil.toFloat(bytes.duplicate());
-        return (double) value;
+    public double decodePrimitive(ByteBuffer bytes, @Nonnull ProtocolVersion protocolVersion) {
+        if (bytes == null || bytes.remaining() != 4)
+            throw new IllegalArgumentException(
+                    "Invalid 32-bits float value, expecting 4 bytes but got " + (bytes == null ? null : bytes.remaining()));
+
+        return bytes.getFloat();
     }
 
     @Override
@@ -75,5 +64,4 @@ public class FloatToDoubleCodec extends AbstractCodec<Double> implements TypeCod
     String formatNonNull(@Nonnull final Double value) {
         return String.valueOf(value);
     }
-
 }
