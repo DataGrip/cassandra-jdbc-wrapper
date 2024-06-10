@@ -34,6 +34,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -160,13 +161,19 @@ public final class JdbcUrlUtil {
     /**
      * JDBC URL parameter key for SSL enabling.
      */
-    public static final String KEY_ENABLE_SSL = "enablessl";
+    public static final String KEY_ENABLE_SSL = "sslenabled";
+    public static final String ENABLE_SSL_DEFAULT = "false";
 
     /**
      * Property name used to retrieve the SSL enabling value when the connection to Cassandra is established. This
      * property is mapped from the JDBC URL parameter {@code enablessl}.
      */
     public static final String TAG_ENABLE_SSL = "enableSsl";
+
+    public static final String KEY_VERIFY_SERVER_CERTIFICATE = "verifyservercertificate";
+    public static final String VERIFY_SERVER_CERTIFICATE_DEFAULT = "true";
+    public static final String[] BOOLEAN_CHOICE = new String[]{"true", "false"};
+    public static final String TAG_VERIFY_SERVER_CERTIFICATE = "verifyServerCertificate";
 
     /**
      * JDBC URL parameter key for the custom SSL engine factory ({@link SslEngineFactory}).
@@ -414,6 +421,9 @@ public final class JdbcUrlUtil {
                 if (params.containsKey(KEY_ENABLE_SSL)) {
                     props.setProperty(TAG_ENABLE_SSL, params.get(KEY_ENABLE_SSL));
                 }
+                if (params.containsKey(KEY_VERIFY_SERVER_CERTIFICATE)) {
+                    props.setProperty(TAG_VERIFY_SERVER_CERTIFICATE, params.get(KEY_VERIFY_SERVER_CERTIFICATE));
+                }
                 if (params.containsKey(KEY_SSL_ENGINE_FACTORY)) {
                     props.setProperty(TAG_SSL_ENGINE_FACTORY, params.get(KEY_SSL_ENGINE_FACTORY));
                 }
@@ -569,7 +579,7 @@ public final class JdbcUrlUtil {
         for (final String param : query.split("&")) {
             try {
                 final String[] pair = param.split("=");
-                final String key = URLDecoder.decode(pair[0], StandardCharsets.UTF_8.displayName()).toLowerCase();
+                final String key = URLDecoder.decode(pair[0], StandardCharsets.UTF_8.displayName()).toLowerCase(Locale.ENGLISH);
                 String value = StringUtils.EMPTY;
                 if (pair.length > 1) {
                     value = URLDecoder.decode(pair[1], StandardCharsets.UTF_8.displayName());

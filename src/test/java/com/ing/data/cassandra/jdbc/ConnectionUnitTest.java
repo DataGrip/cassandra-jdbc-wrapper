@@ -368,7 +368,7 @@ class ConnectionUnitTest extends UsingCassandraContainerTest {
 
     @Test
     void givenDisabledSsl_whenGetConnection_createConnectionWithExpectedConfig() throws Exception {
-        initConnection(KEYSPACE, "enablessl=false", "localdatacenter=datacenter1");
+        initConnection(KEYSPACE, "sslenabled=false", "localdatacenter=datacenter1");
         assertNotNull(sqlConnection);
         assertNotNull(sqlConnection.getSession());
         assertNotNull(sqlConnection.getSession().getContext());
@@ -402,7 +402,7 @@ class ConnectionUnitTest extends UsingCassandraContainerTest {
             Objects.requireNonNull(classLoader.getResource("cassandra.keystore")).getPath());
         System.setProperty(JSSE_KEYSTORE_PASSWORD_PROPERTY, "changeit");
 
-        initConnection(KEYSPACE, "enablessl=true", "localdatacenter=datacenter1");
+        initConnection(KEYSPACE, "sslenabled=true", "localdatacenter=datacenter1");
         assertNotNull(sqlConnection);
         assertNotNull(sqlConnection.getSession());
         assertNotNull(sqlConnection.getSession().getContext());

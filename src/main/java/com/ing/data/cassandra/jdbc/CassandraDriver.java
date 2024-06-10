@@ -36,10 +36,15 @@ import static com.ing.data.cassandra.jdbc.utils.DriverUtil.getDriverProperty;
 import static com.ing.data.cassandra.jdbc.utils.DriverUtil.safeParseVersion;
 import static com.ing.data.cassandra.jdbc.utils.ErrorConstants.CONNECTION_CREATION_FAILED;
 import static com.ing.data.cassandra.jdbc.utils.ErrorConstants.NOT_SUPPORTED;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.BOOLEAN_CHOICE;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.ENABLE_SSL_DEFAULT;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.KEY_ENABLE_SSL;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.KEY_VERIFY_SERVER_CERTIFICATE;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.PROTOCOL;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_CONTACT_POINTS;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_PASSWORD;
 import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.TAG_USER;
+import static com.ing.data.cassandra.jdbc.utils.JdbcUrlUtil.VERIFY_SERVER_CERTIFICATE_DEFAULT;
 
 /**
  * The Cassandra driver implementation.
@@ -125,13 +130,18 @@ public class CassandraDriver implements Driver {
         if (props == null) {
             properties = new Properties();
         }
-        final DriverPropertyInfo[] info = new DriverPropertyInfo[2];
+        final DriverPropertyInfo[] info = new DriverPropertyInfo[4];
 
         info[0] = new DriverPropertyInfo(TAG_USER, properties.getProperty(TAG_USER));
         info[0].description = "The 'user' property";
 
         info[1] = new DriverPropertyInfo(TAG_PASSWORD, properties.getProperty(TAG_PASSWORD));
         info[1].description = "The 'password' property";
+
+        info[2] = new DriverPropertyInfo(KEY_ENABLE_SSL, ENABLE_SSL_DEFAULT);
+        info[2].choices = BOOLEAN_CHOICE;
+        info[3] = new DriverPropertyInfo(KEY_VERIFY_SERVER_CERTIFICATE, VERIFY_SERVER_CERTIFICATE_DEFAULT);
+        info[3].choices = BOOLEAN_CHOICE;
 
         return info;
     }
