@@ -1,3 +1,22 @@
+# DataGrip instructions
+
+This is a fork of ING Bank driver.
+Not all the needed for DataGrip fixes were pushed to upstream, so you need to create new branch, 
+merge branches which were not merged to upstream (hopefully without merge conflicts) and build release from this branch.
+
+Release flow is the following:
+1. Make sure that main branch `release/next` is in sync with upstream `release/next`.
+1. Checkout `release/next`, copy the current version from pom.xml and create new branch `DataGrip/release/<version>-DataGrip-patch-<N>`
+1. Merge branches that were not merged to upstream:
+   ```
+   DataGrip/add-missing-codecs
+   ```
+1. Go to pom.xml and add `-DataGrip-patch-N` postfix to version e.g. `<version>-DataGrip-patch-<N>`
+1. Push new branch
+1. Build bundled jar (`./mvnw clean package -Pbundle`, see more info below).
+1. Create new release on github pointing to latest commit in the new branch and attach `target/...-bundle.jar` to release.
+
+
 # JDBC wrapper of the Java Driver for Apache Cassandra®
 
 [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.txt)
